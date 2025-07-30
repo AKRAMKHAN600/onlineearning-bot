@@ -2,8 +2,9 @@ import json
 import time
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.error import Forbidden
 
-TOKEN = "8288675469:AAE9GvC7a-9gMue9gQnovHRUJ58UbcG_8bk"
+TOKEN = "8288675469:AAE9GvC7a-9gMue9gQnovHRUJ58"
 CHANNEL_ID = "@onlineearning2026toinfinite"
 
 users_file = "users.json"
@@ -24,13 +25,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(user.id)
     users = load_users()
 
-    # Channel join check
-    member = await context.bot.get_chat_member(CHANNEL_ID, user.id)
-    if member.status not in ["member", "administrator", "creator"]:
-        await update.message.reply_text(f"🚫 Please join our channel first: {CHANNEL_ID}")
+    # ✅ Channel join check
+    try:
+        member = await context.bot.get_chat_member(CHANNEL_ID, user.id)
+        if member.status not in ["member", "administrator", "creator"]:
+            await update.message.reply_text(
+                f"🚫 Pehle hamara channel join karo:\n👉 https://t.me/onlineearning2026toinfinite\n\nPhir /start dobara bhejo."
+            )
+            return
+    except Forbidden:
+        await update.message.reply_text("⚠️ Bot ko channel me admin rights do pehle.")
         return
 
-    # New user registration
+    # ✅ New user registration
     if user_id not in users:
         ref_code = context.args[0] if context.args else None
         users[user_id] = {"balance": 0, "referrals": [], "last_bonus": 0}
