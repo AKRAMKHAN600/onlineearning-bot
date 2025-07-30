@@ -154,10 +154,11 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 # --- Main ---
-def main():
-    print("✅ Bot is starting...")
-    app = Application.builder().token(TOKEN).build()
 
+def main():
+    print("✅ Bot is starting... connecting to Telegram...")
+    application = Application.builder().token(TOKEN).build()
+    
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(handle_buttons))
 
