@@ -2,12 +2,15 @@ import json
 import time
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
-from telegram.error import Forbidden
 
-TOKEN = "8288675469:AAE9GvC7a-9gMue9gQnovHRUJ58UbcG_8bk"
-CHANNEL_ID = "@onlineearning2026toinfinite"
+# 🔑 Replace your actual token here
+TOKEN = "8288675469:AAE9GvC7a-9gMue9gQnovHRUJ58"
+CHANNEL_ID = "@onlineearning2026toinfinite"  # Channel username
 
 users_file = "users.json"
+REFERRAL_REWARD = 10
+DAILY_BONUS = 5
+MIN_WITHDRAWAL = 100
 
 def load_users():
     try:
@@ -25,29 +28,30 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(user.id)
     users = load_users()
 
-    # ✅ Channel join check
+    # 🔐 Check if user joined channel
     try:
         member = await context.bot.get_chat_member(CHANNEL_ID, user.id)
         if member.status not in ["member", "administrator", "creator"]:
             await update.message.reply_text(
-                f"🚫 Pehle hamara channel join karo:\n👉 https://t.me/onlineearning2026toinfinite\n\nPhir /start dobara bhejo."
+                f"🚫 Please join our channel first:\n👉 {CHANNEL_ID}\n\nUske baad /start dobara bhejo."
             )
             return
-    except Forbidden:
+    except:
         await update.message.reply_text("⚠️ Bot ko channel me admin rights do pehle.")
         return
 
-    # ✅ New user registration
+    # 🧾 New user registration with referral
     if user_id not in users:
         ref_code = context.args[0] if context.args else None
         users[user_id] = {"balance": 0, "referrals": [], "last_bonus": 0}
 
         if ref_code and ref_code in users and user_id not in users[ref_code]["referrals"]:
-            users[ref_code]["balance"] += 10
+            users[ref_code]["balance"] += REFERRAL_REWARD
             users[ref_code]["referrals"].append(user_id)
 
         save_users(users)
 
+    # ⌨️ Menu
     keyboard = [
         [InlineKeyboardButton("💰 Balance", callback_data="balance")],
         [InlineKeyboardButton("🎁 Daily Bonus", callback_data="bonus")],
@@ -78,7 +82,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         current = int(time.time())
         last = users[user_id].get("last_bonus", 0)
         if current - last >= 86400:
-            users[user_id]["balance"] += 5
+            users[user_id]["balance"] += DAILY_BONUS
             users[user_id]["last_bonus"] = current
             save_users(users)
             await query.edit_message_text("🎁 Daily bonus ₹5 added to your balance!")
@@ -87,7 +91,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif query.data == "withdraw":
         bal = users[user_id]["balance"]
-        if bal >= 100:
+        if bal >= MIN_WITHDRAWAL:
             await query.edit_message_text("✅ Withdrawal request received. We'll process it soon.")
             users[user_id]["balance"] = 0
             save_users(users)
