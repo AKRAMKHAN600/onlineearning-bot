@@ -3,7 +3,7 @@ import time
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
-TOKEN = "8288675469:AAE9GvC7a-9gMue9gQnovHRUJ58"
+TOKEN = "8288675469:AAE9GvC7a-9gMue9gQnovHRUJ58UbcG_8bk"
 CHANNEL_ID = "@onlineearning2026toinfinite"
 
 users_file = "users.json"
