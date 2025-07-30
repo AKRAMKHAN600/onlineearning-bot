@@ -76,18 +76,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+    await query.answer()
     user_id = query.from_user.id
-    data = query.data
 
-    if data == "check_joined":
-        if await check_user_joined(user_id, context):
-            await query.message.edit_text(
-                "✅ Thank you for joining the channel!",
-                reply_markup=get_main_menu()
-            )
-        else:
-            await query.answer("❌ You haven't joined yet!", show_alert=True)
-        return
+    if query.data == "balance":
+        balance = users.get(user_id, {}).get("balance", 0)
+        await query.edit_message_text(f"💰 Your current balance is ₹{balance}")
+
+    elif query.data == "bonus":
+        await query.edit_message_text("🎁 Daily bonus feature coming soon!")
+
+    elif query.data == "withdraw":
+        await query.edit_message_text("💸 Withdraw option coming soon!")
+
+    elif query.data == "how":
+        await query.edit_message_text("❓ Invite friends using your referral link and earn ₹10!")
+
+    elif query.data == "refer":
+        ref_link = get_ref_link(user_id)
+        await query.edit_message_text(
+            text=f"🔗 Your referral link:\n{ref_link}\n\n👥 Invite friends & earn ₹10 per referral!"
+        )
 
     user_data = users.get(user_id)
     if not user_data:
