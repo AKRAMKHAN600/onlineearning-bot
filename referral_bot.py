@@ -64,7 +64,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(f"💼 Your balance: ₹{bal}")
 
     elif query.data == "refer":
-        ref_link = f"https://t.me/Refertoearn2026_bot?start={user_id}"
+        ref_link = f"https://t.me/onlineearningreferearn_bot?start={user_id}"
         await query.edit_message_text(f"🔗 Your referral link:\n{ref_link}\n\n👥 Earn ₹10 per referral!")
 
     elif query.data == "bonus":
